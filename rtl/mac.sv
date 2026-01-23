@@ -3,24 +3,21 @@ multiplies each raw sensor value by their respective coef
 and adds all the results
 */
 
-`include "constants.vh"
+`include "constants.svh"
 
 module mac (
-    input [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1], // parallel data from shift reg
-    input [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1]
-    output wire [DATA_WIDTH] macResult;
-)
-
+    input [`DATA_WIDTH-1:0] pDataIn [0:`NUM_REGS-1], // parallel data from shift reg
+    input [`DATA_WIDTH-1:0] coefs [0:`NUM_REGS-1],
+    output wire [`DATA_WIDTH-1:0] macResult
+);
     integer i;
-    reg [DATA_WIDTH-1:0] macResultReg;
-    reg [DATA_WIDTH-1:0] temp;
+    reg [`DATA_WIDTH-1:0] macResultReg;
 
-    always *@begin
-        for (i=0; i<NUM_REGS; i=i+1) begin
-            temp = coefs[i] * pDataIn[i];
-            macResultReg = temp + macResult;
+    always @* begin
+        macResultReg=0;
+        for (i=0; i<`NUM_REGS; i=i+1) begin
+            macResultReg += coefs[i] * pDataIn[i];
         end
-        // ALSO: take care of if mac result is more then 32 bits
-    assign macResult=macResultReg;
     end
+    assign macResult=macResultReg;
 endmodule

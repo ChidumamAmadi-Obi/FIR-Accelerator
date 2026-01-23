@@ -1,7 +1,7 @@
-`include "constants.v"
-
-`timescale 1ns/1ps
+`include "constants.svh"
 
 module top_tb;
-
+    initial begin
+        $display("hello world");  $finish;
+    end
 endmodule

@@ -2,36 +2,57 @@
 
 */
 
-`include "constants.vh"
-`include "shiftreg.v"
-`include "mac.v"
+`include "constants.svh"
+`include "shiftreg.sv"
+`include "mac.sv"
 
-module top #(
-    parameter NUM_REGS `NUM_REGS // number of elements in shift register
-    parameter DATA_WIDTH `DATA_WIDTH // 32 bits
-)( 
-    input clk, 
-    input rst, // reset shift register in accelerator
-    input accelerateEn, // to enable accelerator
-    input rawSensorVal[DATA_WIDTH-1:0], 
-    input [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1], // coefficneits
-    output reg macResult[DATA_WIDTH-1:0] // result
+module top( 
+    input logic clk, 
+    input logic rstN, // active low reset
+    input logic accelerateEn, // to enable accelerator
+    input logic [`DATA_WIDTH-1:0] rawSensorVal, 
+    input logic [`DATA_WIDTH-1:0] coefs [0:`NUM_REGS-1], // coefficients
+    output logic [`DATA_WIDTH-1:0] macResult, // result
+    output logic resultIsValid
     );
 
-    wire [DATA_WIDTH-1:0] pDataIntoMac [0:NUM_REGS-1]
-    wire [DATA_WIDTH-1:0] out; 
+    // internal signals
+    logic [`DATA_WIDTH-1:0] pDataIntoMac [0:`NUM_REGS-1];
+    logic [`DATA_WIDTH-1:0] macResultWire;
+    logic accelerateEnSync;
+
+    // sync enable signal (1-stage synchronizer)
+    // NEED TO ADD TWO STAGE SYNCHRONIZER
+    always_ff @(posedge clk or negedge rstN) begin
+        if (!rstN) begin
+            accelerateEnSync <= 1'b0;
+        end else begin
+            accelerateEnSync <= accelerateEn;
+        end
+    end
 
     shiftReg shiftRegInstance (
         .clk(clk),
-        .rst(rst),
-        .serialDataIn(rawSensorVal),
-        .pDataOut(pDataIntoMac),
+        .rst(!rstN), // convert reset sig to active high
+        .sDataIn(rawSensorVal),
+        .pDataOut(pDataIntoMac)
     );
 
     mac macInstance (
-        pDataIn(pDataIntoMac),
-        coefs(coefs),
-        macResult(macResult)
-    );
+        .pDataIn(pDataIntoMac),
+        .coefs(coefs),
+        .macResult(macResultWire)
+    );   
 
+    always_ff @(posedge clk or negedge rstN) begin // output result to register with enable
+        if (!rstN) begin
+            macResult   <= '0;
+            resultIsValid <= 1'b0;
+        end else if (accelerateEnSync) begin
+            macResult   <= macResultWire;
+            resultIsValid <= 1'b1; // sig valid result
+        end else begin
+            resultIsValid <= 1'b0;
+        end
+    end
 endmodule
