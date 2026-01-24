@@ -4,16 +4,10 @@
 `timescale 1ns/1ps
 `define DATA_WIDTH 32 // 32 bit mcu
 `define NUM_REGS 8
+`define ACC_WIDTH `DATA_WIDTH*2
+`define Q_FORMAT `DATA_WIDTH/2
+`define SCALE 1<<`Q_FORMAT
 
-// HELPER FUNCTIONS
-function automatic logic signed [DATA_WIDTH-1:0] r2f(real val); // real number to interger
-	return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
-endfunction
-function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // interger to real number
-	return val << Q_FORMAT;
-endfunction
-function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
-	return real'(fixed) / SCALE;
-endfunction
+// https://learn.verificationstudio.com/tutorials/1/systemverilog-tutorial/subcontents/10/randomization
 
 `endif
