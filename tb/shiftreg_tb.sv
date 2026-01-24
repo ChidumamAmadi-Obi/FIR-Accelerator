@@ -5,11 +5,11 @@
 
 module shiftreg_tb;
 
-reg clk;
-reg rst;
+logic clk;
+logic rst;
 
-reg [`DATA_WIDTH-1:0] rawSensorVal; // simulated raw sensor value
-wire [`DATA_WIDTH-1:0] pDataOut [0:`NUM_REGS-1]; // parallel data out
+logic [`DATA_WIDTH-1:0] rawSensorVal; // simulated raw sensor value
+logic [`DATA_WIDTH-1:0] pDataOut [0:`NUM_REGS-1]; // parallel data out
 
 shiftReg dut(
     .clk(clk),
