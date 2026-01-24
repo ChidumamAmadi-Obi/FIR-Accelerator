@@ -1,31 +1,21 @@
-`include "constants.svh"
+`include "helpers.svh"
 
 module mac_tb;
-    localparam Q_FORMAT = 16;
+    localparam DATA_WIDTH = `DATA_WIDTH;
+	localparam Q_FORMAT = DATA_WIDTH/2;
     localparam SCALE = 1 << Q_FORMAT;  // 65536
-    logic signed [`DATA_WIDTH-1:0] pDataIn [0:`NUM_REGS-1];
-    logic signed [`DATA_WIDTH-1:0] coefs [0:`NUM_REGS-1];
-    logic signed [`DATA_WIDTH-1:0] macResult;
+	localparam NUM_REGS = `NUM_REGS;
+
+    logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1];
+    logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1];
+    logic signed [DATA_WIDTH-1:0] macResult;
     
-	mac dut (
+	mac macInstance (
 		.pDataIn(pDataIn),
 		.coefs(coefs),
 		.macResult(macResult)
 	);
 
-	// helpter functions
-	function automatic logic signed [`DATA_WIDTH-1:0] r2f(real val); // real number to interger
-		return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
-	endfunction
-
-	function automatic logic signed [`DATA_WIDTH-1:0] i2f(int val); // interger to real number
-		return val << Q_FORMAT;
-	endfunction
-	
-	function automatic real f2r(logic signed [`DATA_WIDTH-1:0] fixed); // fixed-point to real
-		return real'(fixed) / SCALE;
-	endfunction
-	
 	initial begin
 		$monitor("DATA IN: %d %d %d %d %d %d %d %d, MACRESULT: %f", pDataIn[0],pDataIn[1],pDataIn[2],pDataIn[3],pDataIn[4],pDataIn[5],pDataIn[6],pDataIn[7],f2r(macResult));
 		

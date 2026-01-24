@@ -5,10 +5,14 @@ and adds all the results
 
 `include "constants.svh"
 
-module mac# ( parameter Q_FORMAT=16) (
-    input logic signed [`DATA_WIDTH-1:0] pDataIn [0:`NUM_REGS-1], // parallel data from shift reg
-    input logic signed [`DATA_WIDTH-1:0] coefs [0:`NUM_REGS-1],
-    output logic signed [`DATA_WIDTH-1:0] macResult
+module mac# ( 
+    parameter DATA_WIDTH=`DATA_WIDTH,
+    parameter NUM_REGS=`NUM_REGS,
+    parameter Q_FORMAT=DATA_WIDTH/2
+) (
+    input logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1], // parallel data from shift reg
+    input logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
+    output logic signed [DATA_WIDTH-1:0] macResult
 );
 
     localparam ACC_WIDTH = 2*`DATA_WIDTH + $clog2(`NUM_REGS);
@@ -20,7 +24,7 @@ module mac# ( parameter Q_FORMAT=16) (
     always_comb begin
         accumulator = 0;
         for (i=0; i<`NUM_REGS; i++) begin // fixed-point multiplication because result has 2*Q_FORMAT fractional bits
-            accumulator += $signed(coefs[i]) * $signed(pDataIn[i]);
+            accumulator += (coefs[i]) * (pDataIn[i]);
         end
         
         // then scale back to Q_FORMAT fractional bits

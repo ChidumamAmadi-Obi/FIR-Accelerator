@@ -1,20 +1,22 @@
 /* SIMPLE SHIFT REGISTER TEST BENCH
 */
 
-`include "constants.svh"
+`include "helpers.svh"
 
 module shiftreg_tb;
+localparam DATA_WIDTH = `DATA_WIDTH;
+localparam NUM_REGS = `NUM_REGS;
 
 logic clk;
 logic rst;
 
-logic [`DATA_WIDTH-1:0] rawSensorVal; // simulated raw sensor value
-logic [`DATA_WIDTH-1:0] pDataOut [0:`NUM_REGS-1]; // parallel data out
+logic [DATA_WIDTH-1:0] rawSensorVal; // simulated raw sensor value
+logic [DATA_WIDTH-1:0] pDataOut [0:NUM_REGS-1]; // parallel data out
 
-shiftReg dut(
+shiftReg shiftRegInstance (
     .clk(clk),
     .rst(rst),
-    .serialDataIn(rawSensorVal),
+    .sDataIn(rawSensorVal),
     .pDataOut(pDataOut)
 );
 

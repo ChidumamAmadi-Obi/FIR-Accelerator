@@ -6,19 +6,22 @@
 `include "shiftreg.sv"
 `include "mac.sv"
 
-module top( 
+module top#(
+    parameter DATA_WIDTH=`DATA_WIDTH,
+    parameter NUM_REGS=`NUM_REGS
+)( 
     input logic clk, 
     input logic rstN, // active low reset
     input logic accelerateEn, // to enable accelerator
-    input logic [`DATA_WIDTH-1:0] rawSensorVal, 
-    input logic [`DATA_WIDTH-1:0] coefs [0:`NUM_REGS-1], // coefficients
-    output logic [`DATA_WIDTH-1:0] macResult, // result
+    input logic [DATA_WIDTH-1:0] rawSensorVal, 
+    input logic [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1], // coefficients
+    output logic [DATA_WIDTH-1:0] macResult, // result
     output logic resultIsValid
     );
 
     // internal signals
-    logic [`DATA_WIDTH-1:0] pDataIntoMac [0:`NUM_REGS-1];
-    logic [`DATA_WIDTH-1:0] macResultWire;
+    logic [DATA_WIDTH-1:0] pDataIntoMac [0:NUM_REGS-1];
+    logic [DATA_WIDTH-1:0] macResultWire;
     logic accelerateEnSync;
 
     // sync enable signal (1-stage synchronizer)
