@@ -12,7 +12,7 @@ module top_tb;
     logic clk; // inputs
     logic rstN;
     logic accelerateEn;
-    logic sensorIn;
+    logic [DATA_WIDTH-1:0] sensorIn;
     logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1];
 
     logic signed [DATA_WIDTH-1:0] resultOut; // outputs
@@ -47,16 +47,9 @@ module top_tb;
     function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
     	return real'(fixed) / SCALE;
     endfunction
-  
-    task clkPulse(ref logic clk); // assume clk starts off low
-        clk=~clk; #5; // high
-        clk=~clk; #5; // low
-    endtask
 
     initial begin
-        $monitor("RESULT: %d VALIDITY: %b", f2r(resultOut), valid);
-        #10;
-
+        
         errors=0;
         testNumber=0;
         expectedMacResult=0;
@@ -72,24 +65,44 @@ module top_tb;
         coefs[5]=r2f(0.2);
         coefs[6]=r2f(0.2);
         coefs[7]=r2f(0.2);
-        #10;
 
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
-        sensorIn=$urandom_range(1,10); #10;
-        clkPulse(clk);
+      	$display("\n\n-----");
+        $monitor("TIME: %d SENSORIN: %d RESULT: %f VALIDITY: %b", $time, sensorIn, f2r(resultOut), valid);
+
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk); // test inserting sensor values
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+
+        accelerateEn=0; // test enable
+
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+
+        accelerateEn=1; 
+        clkPulse(rstN); // test reset  (high to low pulse)
+
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        sensorIn=i2f($urandom_range(1,5)); clkPulse(clk);
+        
+        $display("\n\n-----");
         $finish;        
     end
 endmodule
+
+

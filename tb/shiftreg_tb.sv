@@ -21,47 +21,38 @@ shiftReg shiftRegInstance (
 );
 
 initial begin
-    clk=1'b0;
-    rst=1'b0;
-    #10;
-    $monitor("DATA IN: %d DATA OUT:%d %d %d %d %d %d %d %d ",rawSensorVal, pDataOut[0],pDataOut[1],pDataOut[2],pDataOut[3],pDataOut[4],pDataOut[5],pDataOut[6],pDataOut[7]);
+    clk=0; rst=0; #10;
+
+    $display("\n\n-----");
+    $monitor("TIME: %d DATA IN: %d DATA OUT:%d %d %d %d %d %d %d %d ",
+      $time,
+      rawSensorVal, 
+      pDataOut[0],pDataOut[1],pDataOut[2],pDataOut[3],
+      pDataOut[4],pDataOut[5],pDataOut[6],pDataOut[7]);
     
-    rawSensorVal=1; 
-    clk=~clk; #5 clk=~clk; // one clock cycle
-    #10;
-    rawSensorVal=2;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=3;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=4;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=5;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=6;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=7;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=8;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=9;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=10;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=11;
-    clk=~clk; #5 clk=~clk;
-    #10;
-    rawSensorVal=12;
-    clk=~clk; #5 clk=~clk;
-    #10;  
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk); // test inserting into shift reg
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+
+    clkPulse(rst); // test reset
+    
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk); // populate shift reg again
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+    rawSensorVal=$urandom_range(1,5); clkPulse(clk);
+
+    $display("\n\n-----");
     $finish;
 end
 

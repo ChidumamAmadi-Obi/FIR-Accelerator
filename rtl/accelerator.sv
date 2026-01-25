@@ -4,7 +4,7 @@
 `include "constants.svh"
 `include "top.sv"
 
-module firAccelerators()
+module firAccelerator()
 
 endmodule
 

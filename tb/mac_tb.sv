@@ -28,15 +28,12 @@ module mac_tb;
     function automatic logic signed [DATA_WIDTH-1:0] r2f(real val);
     	return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
     endfunction
-    
     function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // integer to fixed-point
         return val << Q_FORMAT;
     endfunction
-    
     function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
     	return real'(fixed) / SCALE;
     endfunction
-  
     function automatic real verifMac( // calculate expected mac result
         logic signed [DATA_WIDTH-1:0] pDataIn_array [0:NUM_REGS-1],
         logic signed [DATA_WIDTH-1:0] coefs_array [0:NUM_REGS-1] );
@@ -54,14 +51,36 @@ module mac_tb;
     endfunction
   
     task automatic randomPData( // get random values for p data
-        ref logic signed [DATA_WIDTH-1:0] pData_array [0:NUM_REGS-1],
-        input int min,
-        input int max );
+      ref logic signed [DATA_WIDTH-1:0] pData_array [0:NUM_REGS-1],
+      input int min,
+      input int max );
         for (integer i=0; i<NUM_REGS; i++) begin
             pData_array[i] = i2f($urandom_range(min, max));
         end
     endtask
-    
+    task automatic writeCoefs(
+      ref logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
+      input value );
+        if (value%1 == 0) begin // if value is an integer
+            coefs[0]=i2f(value);
+            coefs[1]=i2f(value);
+            coefs[2]=i2f(value);
+            coefs[3]=i2f(value);
+            coefs[4]=i2f(value);
+            coefs[5]=i2f(value);
+            coefs[6]=i2f(value);
+            coefs[7]=i2f(value); 
+        end else begin 
+            coefs[0]=r2f(value);
+            coefs[1]=r2f(value);
+            coefs[2]=r2f(value);
+            coefs[3]=r2f(value);
+            coefs[4]=r2f(value);
+            coefs[5]=r2f(value);
+            coefs[6]=r2f(value);
+            coefs[7]=r2f(value);
+        end
+    endtask
     task trackErrors( 
         ref logic [NUM_TESTS-1:0] errors, 
         ref integer testNumber,
@@ -83,7 +102,6 @@ module mac_tb;
         end
         testNumber++;
     endtask
-    
     task reportErrors();
         noOfErrors = 0;
         
@@ -103,6 +121,7 @@ module mac_tb;
     endtask
     
     initial begin
+        $display("\n\n-----");
         $monitor("DATA IN: %d %d %d %d %d %d %d %d, MACRESULT: %f EXPECTED MACRESULT: %f", 
             f2r(pDataIn[0]), f2r(pDataIn[1]), f2r(pDataIn[2]), f2r(pDataIn[3]),
             f2r(pDataIn[4]), f2r(pDataIn[5]), f2r(pDataIn[6]), f2r(pDataIn[7]),
@@ -112,63 +131,37 @@ module mac_tb;
         testNumber = 0;
             
         // Test 1: Random values with coefs = 1
-        coefs[0]=i2f(1);
-        coefs[1]=i2f(1);
-        coefs[2]=i2f(1);
-        coefs[3]=i2f(1);
-        coefs[4]=i2f(1);
-        coefs[5]=i2f(1);
-        coefs[6]=i2f(1);
-        coefs[7]=i2f(1);
+        writeCoefs(1);
         randomPData(pDataIn,1,5);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
         
         // Test 2: Random values with coefs = 0.2
-        coefs[0]=r2f(0.2);
-        coefs[1]=r2f(0.2);
-        coefs[2]=r2f(0.2);
-        coefs[3]=r2f(0.2);
-        coefs[4]=r2f(0.2);
-        coefs[5]=r2f(0.2);
-        coefs[6]=r2f(0.2);
-        coefs[7]=r2f(0.2);
+        writeCoefs(0.2);
         randomPData(pDataIn,1,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10; 
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // Test 3: Random values (including negative) with coefs = 0.2
-        coefs[0]=r2f(0.2);
-        coefs[1]=r2f(0.2);
-        coefs[2]=r2f(0.2);
-        coefs[3]=r2f(0.2);
-        coefs[4]=r2f(0.2);
-        coefs[5]=r2f(0.2);
-        coefs[6]=r2f(0.2);
-        coefs[7]=r2f(0.2);
+        writeCoefs(0.2);
         randomPData(pDataIn,-20,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // Test 4: Random values with coefs = 0.1
-        coefs[0]=r2f(0.1);
-        coefs[1]=r2f(0.1);
-        coefs[2]=r2f(0.1);
-        coefs[3]=r2f(0.1);
-        coefs[4]=r2f(0.1);
-        coefs[5]=r2f(0.1);
-        coefs[6]=r2f(0.1);
-        coefs[7]=r2f(0.1);
+        writeCoefs(0.1);
         randomPData(pDataIn,1,50);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10; 
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         #10;
+        $display("\n\n-----");
         reportErrors();
+        $display("\n\n-----");
         $finish;
     end
 endmodule

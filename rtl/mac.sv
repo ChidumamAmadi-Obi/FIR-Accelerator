@@ -8,22 +8,22 @@ and adds all the results
 module mac# ( 
     parameter DATA_WIDTH=`DATA_WIDTH,
     parameter NUM_REGS=`NUM_REGS,
-    parameter Q_FORMAT=DATA_WIDTH/2
+    parameter Q_FORMAT=`Q_FORMAT
 ) (
     input logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1], // parallel data from shift reg
     input logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
     output logic signed [DATA_WIDTH-1:0] macResult
 );
 
-    localparam ACC_WIDTH = 2*`DATA_WIDTH + $clog2(`NUM_REGS);
+    localparam ACC_WIDTH = 2*`DATA_WIDTH + $clog2(`NUM_REGS); // ref https://circuitcove.com/system-tasks-clog2/
 
-    integer i;
     logic signed [ACC_WIDTH-1:0] accumulator;
     logic signed [ACC_WIDTH-1:0] accumulatorScaled;
 
     always_comb begin
         accumulator = 0;
-        for (i=0; i<`NUM_REGS; i++) begin // fixed-point multiplication because result has 2*Q_FORMAT fractional bits
+        accumulatorScaled = 0;
+        for (integer i=0; i<NUM_REGS; i++) begin // fixed-point multiplication because result has 2*Q_FORMAT fractional bits
             accumulator += (coefs[i]) * (pDataIn[i]);
         end
         
