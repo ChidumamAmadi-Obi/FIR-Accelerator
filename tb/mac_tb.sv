@@ -25,10 +25,10 @@ module mac_tb;
 	);
   
     // HELPER FUNCTIONS & TASKS
-    function automatic logic signed [DATA_WIDTH-1:0] r2f(real val);
+    function automatic logic signed [DATA_WIDTH-1:0] r2f(real val); // real to fixed point 32 bit
     	return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
     endfunction
-    function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // integer to fixed-point
+    function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // integer to fixed-point 32 bit
         return val << Q_FORMAT;
     endfunction
     function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
@@ -50,7 +50,7 @@ module mac_tb;
         return f2r(result);
     endfunction
   
-    task automatic randomPData( // get random values for p data
+    task automatic randomPData( // get random values for p data in
       ref logic signed [DATA_WIDTH-1:0] pData_array [0:NUM_REGS-1],
       input int min,
       input int max );
@@ -60,28 +60,19 @@ module mac_tb;
     endtask
     task automatic writeCoefs(
       ref logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
-      input value );
-        if (value%1 == 0) begin // if value is an integer
-            coefs[0]=i2f(value);
-            coefs[1]=i2f(value);
-            coefs[2]=i2f(value);
-            coefs[3]=i2f(value);
-            coefs[4]=i2f(value);
-            coefs[5]=i2f(value);
-            coefs[6]=i2f(value);
-            coefs[7]=i2f(value); 
+      input real value );  // Declare as real type
+
+        if (value == $floor(value)) begin // if value is an integer
+            for (int i = 0; i < NUM_REGS; i++) begin
+                coefs[i] = i2f(int'(value));  // Cast to int before conversion
+            end
         end else begin 
-            coefs[0]=r2f(value);
-            coefs[1]=r2f(value);
-            coefs[2]=r2f(value);
-            coefs[3]=r2f(value);
-            coefs[4]=r2f(value);
-            coefs[5]=r2f(value);
-            coefs[6]=r2f(value);
-            coefs[7]=r2f(value);
+            for (int i = 0; i < NUM_REGS; i++) begin
+                coefs[i] = r2f(value);
+            end
         end
     endtask
-    task trackErrors( 
+    task trackErrors( // track errors for mac module only
         ref logic [NUM_TESTS-1:0] errors, 
         ref integer testNumber,
         input logic signed [DATA_WIDTH-1:0] macResult,
@@ -119,7 +110,7 @@ module mac_tb;
             $display("TEST FAILED, TOTAL NUMBER OF ERRORS IS %0d", noOfErrors);
         end
     endtask
-    
+
     initial begin
         $display("\n\n-----");
         $monitor("DATA IN: %d %d %d %d %d %d %d %d, MACRESULT: %f EXPECTED MACRESULT: %f", 
@@ -131,37 +122,37 @@ module mac_tb;
         testNumber = 0;
             
         // Test 1: Random values with coefs = 1
-        writeCoefs(1);
+        writeCoefs(coefs,1);
         randomPData(pDataIn,1,5);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
         
         // Test 2: Random values with coefs = 0.2
-        writeCoefs(0.2);
+        writeCoefs(coefs,0.2);
         randomPData(pDataIn,1,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10; 
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // Test 3: Random values (including negative) with coefs = 0.2
-        writeCoefs(0.2);
+        writeCoefs(coefs,0.2);
         randomPData(pDataIn,-20,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // Test 4: Random values with coefs = 0.1
-        writeCoefs(0.1);
+        writeCoefs(coefs,0.1);
         randomPData(pDataIn,1,50);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10; 
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         #10;
-        $display("\n\n-----");
+        $display("\n-----");
         reportErrors();
-        $display("\n\n-----");
+         $display("-----\n\n");
         $finish;
     end
 endmodule

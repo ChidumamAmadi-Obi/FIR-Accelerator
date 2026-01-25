@@ -9,7 +9,8 @@
 `define SCALE 1<<`Q_FORMAT
 
 // TASKS AND FUNCTIONS
-task clkPulse(ref logic clk); // assume clk starts off low
+task pulse(ref logic clk);
+    // assume sig starts off low
     clk=~clk; #5; // high
     clk=~clk; #5; // low
 endtask
