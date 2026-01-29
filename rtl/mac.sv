@@ -15,7 +15,7 @@ module mac# (
     output logic signed [DATA_WIDTH-1:0] macResult
 );
 
-    localparam ACC_WIDTH = 2*`DATA_WIDTH + $clog2(`NUM_REGS); // ref https://circuitcove.com/system-tasks-clog2/
+    localparam ACC_WIDTH = 2*DATA_WIDTH + $clog2(NUM_REGS); // ref https://circuitcove.com/system-tasks-clog2/
 
     logic signed [ACC_WIDTH-1:0] accumulator;
     logic signed [ACC_WIDTH-1:0] accumulatorScaled;

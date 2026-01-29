@@ -22,6 +22,11 @@ module top_tb;
     // expected results
     real expectedMacResult;
     logic expectedValid;
+
+    // error checking and reporting
+	logic [NUM_TESTS-1:0] errors;
+	logic isAnError;
+	integer noOfErrors, testNumber;
     
     top topInstance (
         .clk(clk),
@@ -66,9 +71,11 @@ module top_tb;
     endtask
 
     initial begin
-        
-        errors=0;
+
+        noOfErrors=0;
+        isAnError=0;
         testNumber=0;
+        
         expectedMacResult=0;
         clrC=0;
         clk=0; // start clock low
