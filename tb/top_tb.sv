@@ -1,11 +1,6 @@
 `include "helpers.svh"
 
 module top_tb;
-	localparam DATA_WIDTH = `DATA_WIDTH;
-	localparam NUM_REGS = `NUM_REGS;
-    localparam SCALE = `SCALE;
-    localparam Q_FORMAT = `Q_FORMAT;
-    localparam NUM_TESTS = 0;
 
     logic clk; // inputs
     logic rstN;
@@ -17,16 +12,8 @@ module top_tb;
     logic signed [DATA_WIDTH-1:0] coeffsIn;
 
     logic signed [DATA_WIDTH-1:0] resultOut; // outputs
+    logic busy;
     logic valid;
-
-    // expected results
-    real expectedMacResult;
-    logic expectedValid;
-
-    // error checking and reporting
-	logic [NUM_TESTS-1:0] errors;
-	logic isAnError;
-	integer noOfErrors, testNumber;
     
     top topInstance (
         .clk(clk),
@@ -34,23 +21,13 @@ module top_tb;
         .clrC(clrC),
         .coeffWriteEn(coeffWriteEn),
         .coeffAddress(coeffAddress),
-        .coeffsIn(coeffsIn),
+        .coeffIn(coeffsIn),
         .accelerateEn(accelerateEn),
         .rawSensorVal(sensorIn),
         .macResult(resultOut),
-        .resultIsValid(valid)
+        .resultIsValid(valid),
+        .busy(busy)
     );
-
-    // HELPER FUNCTIONS & TASKS
-    function automatic logic signed [DATA_WIDTH-1:0] r2f(real val); // real to fixed point
-    	return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
-    endfunction  
-    function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // integer to fixed-point
-        return val << Q_FORMAT;
-    endfunction
-    function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
-    	return real'(fixed) / SCALE;
-    endfunction
 
     task loadCoeffs(
         input real coeffVal,
@@ -59,7 +36,7 @@ module top_tb;
         ref logic coeffWriteEn );
 
         coeffWriteEn=1; // start with coeff write enabled to load coefs into memory
-        coeffAddress=3'b000; // start writting to address 000
+        coeffAddress=3'b000; // start writting from address 000
 
         for (integer i=0; i<NUM_REGS; i++) begin
             coeffsIn=r2f(coeffVal); 
@@ -69,60 +46,47 @@ module top_tb;
         end
         coeffWriteEn=0;
     endtask
+    task sendRandomData(
+        input integer no, // number of data points to be inserted
+        input real min,
+        input real max,
+        ref logic [DATA_WIDTH-1:0] sensorIn);
+
+        for (integer i=0; i<=no; i++) begin
+            sensorIn=i2f($urandom_range(min,max));
+            pulse(clk);           
+        end
+    endtask
 
     initial begin
-
-        noOfErrors=0;
-        isAnError=0;
-        testNumber=0;
-        
-        expectedMacResult=0;
         clrC=0;
         clk=0; // start clock low
         rstN=1; // start reset high (active low input)
         accelerateEn=1; // start enable high (active high input)
+
+        pulse(rstN); // start by reseting module first
         
         $display("\n\n-----");
         loadCoeffs(0.2,coeffsIn, coeffAddress, coeffWriteEn); // first load coeffs into reg file
-
-        $monitor("TIME: %d SENSORIN: %d RESULT: %f VALIDITY: %b A_ENABLE: %b RSTN: %b",
+        $display("\n-----\n");
+        $display("T     SENSORIN   RESULT VALIDITY A_ENABLE RSTN");
+        $monitor("%0d -     %d     %0f     %b       %b     %b",
           $time, f2r(sensorIn), f2r(resultOut), valid, accelerateEn, rstN);
 
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk); // test inserting sensor values
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
+        // test inserting 16 random sensor values between 0 and 5, result is zero until all (8) registers are populated
+        sendRandomData(16,0,5,sensorIn); 
 
-        accelerateEn=0; // test enable
+        // test enable
+        // when sensor values come in and the accelerator is not enabled
+        // the accelerator does not process it and its output is not affected
+        accelerateEn=0; pulse(clk);
+        sendRandomData(6,0,5,sensorIn);
 
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-
-        accelerateEn=1; 
+        accelerateEn=1; pulse(clk); // re enable module
+        sendRandomData(6,0,5,sensorIn);
       
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-      
-        pulse(rstN); // test reset  (high to low pulse)
-
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
-        sensorIn=i2f($urandom_range(1,5)); pulse(clk);
+        pulse(rstN); // test reset  (high to low pulse), this should clear all registers
+        sendRandomData(16,0,5,sensorIn); 
         
         $display("-----\n\n");
         $finish;        

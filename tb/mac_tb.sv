@@ -1,11 +1,6 @@
 `include "helpers.svh"
 
 module mac_tb;
-    localparam DATA_WIDTH = `DATA_WIDTH;
-	localparam Q_FORMAT = `Q_FORMAT;
-    localparam SCALE = `SCALE;  // 65536
-	localparam NUM_REGS = `NUM_REGS;
-    localparam ACC_WIDTH = `ACC_WIDTH;
 	localparam NUM_TESTS = 4;
 
     logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1];
@@ -25,15 +20,6 @@ module mac_tb;
 	);
   
     // HELPER FUNCTIONS & TASKS
-    function automatic logic signed [DATA_WIDTH-1:0] r2f(real val); // real to fixed point 32 bit
-    	return int'(val * SCALE + (val >= 0 ? 0.5 : -0.5));
-    endfunction
-    function automatic logic signed [DATA_WIDTH-1:0] i2f(int val); // integer to fixed-point 32 bit
-        return val << Q_FORMAT;
-    endfunction
-    function automatic real f2r(logic signed [DATA_WIDTH-1:0] fixed); // fixed-point to real
-    	return real'(fixed) / SCALE;
-    endfunction
     function automatic real verifMac( // calculate expected mac result
         logic signed [DATA_WIDTH-1:0] pDataIn_array [0:NUM_REGS-1],
         logic signed [DATA_WIDTH-1:0] coefs_array [0:NUM_REGS-1] );
@@ -121,28 +107,28 @@ module mac_tb;
         errors = 0;
         testNumber = 0;
             
-        // Test 1: Random values with coefs = 1
+        // no 1: Random values with coefs = 1
         writeCoefs(coefs,1);
         randomPData(pDataIn,1,5);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
         
-        // Test 2: Random values with coefs = 0.2
+        // no 2: Random values with coefs = 0.2
         writeCoefs(coefs,0.2);
         randomPData(pDataIn,1,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10; 
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
-        // Test 3: Random values (including negative) with coefs = 0.2
+        // no 3: Random values (including negative) with coefs = 0.2
         writeCoefs(coefs,0.2);
         randomPData(pDataIn,-20,20);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
-        // Test 4: Random values with coefs = 0.1
+        // no 4: Random values with coefs = 0.1
         writeCoefs(coefs,0.1);
         randomPData(pDataIn,1,50);
         expectedMacResult=verifMac(pDataIn,coefs);

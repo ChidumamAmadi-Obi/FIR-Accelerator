@@ -4,8 +4,6 @@
 `include "helpers.svh"
 
 module shiftreg_tb;
-localparam DATA_WIDTH = `DATA_WIDTH;
-localparam NUM_REGS = `NUM_REGS;
 
 logic clk;
 logic rst;
