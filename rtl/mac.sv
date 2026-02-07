@@ -5,11 +5,7 @@ and adds all the results
 
 `include "constants.svh"
 
-module mac# ( 
-    parameter DATA_WIDTH=`DATA_WIDTH,
-    parameter NUM_REGS=`NUM_REGS,
-    parameter Q_FORMAT=`Q_FORMAT
-) (
+module mac (
     input logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1], // parallel data from shift reg
     input logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
     output logic signed [DATA_WIDTH-1:0] macResult
@@ -29,7 +25,12 @@ module mac# (
         
         // then scale back to Q_FORMAT fractional bits
         // Add rounding ,2^(Q_FORMAT-1) before truncation
-        accumulatorScaled = accumulator + (1 << (Q_FORMAT-1));
+        if (accumulator >= 0) begin 
+            accumulatorScaled = accumulator + (1 << (Q_FORMAT-1));
+        end else begin
+            accumulatorScaled = accumulator - (1 << (Q_FORMAT-1));
+        end
+        
     end
     assign macResult = accumulatorScaled[ACC_WIDTH-1:Q_FORMAT];// Truncate to original width, keep sign extended
 endmodule

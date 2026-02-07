@@ -6,10 +6,7 @@
 `include "shiftreg.sv"
 `include "mac.sv"
 
-module top#(
-    parameter DATA_WIDTH=`DATA_WIDTH,
-    parameter NUM_REGS=`NUM_REGS
-)( 
+module top( 
     input logic clk, 
     input logic rstN, // active low reset
     input logic clrC, // clear coeffs in register file
@@ -19,7 +16,8 @@ module top#(
     input logic [DATA_WIDTH-1:0] rawSensorVal, 
     input logic [DATA_WIDTH-1:0] coeffIn, // coefficient
     output logic [DATA_WIDTH-1:0] macResult, // result
-    output logic resultIsValid
+    output logic resultIsValid,
+    output logic busy
     );
 
     // internal signals and registers
@@ -28,7 +26,6 @@ module top#(
     logic [DATA_WIDTH-1:0] macResultWire;
     logic [1:0] accelerateEnSync; // 2 stage sync reg
     logic accelerateEnSyncClean; // synced and clean signal 
-
     
     always_ff @(posedge clk or negedge rstN) begin // 2-stage synchronizer with asynch reset
         if (!rstN) begin
@@ -72,4 +69,6 @@ module top#(
             resultIsValid <= 1'b0;
         end
     end
+
+    assign  busy = accelerateEnSyncClean; // accelerator is busy wehen its enabled and computing
 endmodule

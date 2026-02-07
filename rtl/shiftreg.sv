@@ -5,10 +5,7 @@ shift register, then paralell out all elements in shift register
 
 `include "constants.svh"
 
-module shiftReg# (
-	parameter NUM_REGS=`NUM_REGS,
-	parameter DATA_WIDTH=`DATA_WIDTH
-) (
+module shiftReg (
     input logic clk,
     input logic rst,
     input logic [DATA_WIDTH-1:0] sDataIn, // serial data in
