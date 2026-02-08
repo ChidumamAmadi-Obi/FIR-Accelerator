@@ -6,8 +6,12 @@ description: "Custom Finite Impulse Response (FIR) accelerator peripheral"
 filesets:
     files_rtl:
         depend:
+            - x-heep::packages
             - pulp-platform.org::common_cells
+            - pulp-platform.org::register_interface
         files: 
+            - rtl/fir_accelerator_reg_pkg.sv
+            - rtl/fir_accelerator_reg_top.sv
             - rtl/shiftreg.sv
             - rtl/mac.sv
             - rtl/top.sv

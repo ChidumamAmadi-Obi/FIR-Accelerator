@@ -6,10 +6,11 @@
   name: "fir_accelerator",
   clock_primary: "clk_i",
   reset_primary: "rst_ni",
-  bus_device: "reg",
+  bus_interfaces: [
+    { protocol: "reg_iface", direction: "device" }
+  ]
   regwidth: "32",
   
-  // All your buttons and lights go here!
   registers: [
     {
       name: "CONTROL",
