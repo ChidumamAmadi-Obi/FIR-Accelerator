@@ -1,0 +1,119 @@
+// this tells the cpu & x-heep what registers to generate in the register package
+// the generated register package (fir_accelerator_reg_pkg.sv) will be used to connect the 
+// peripheral to the rest of the cpu
+
+{
+  name: "fir_accelerator",
+  clock_primary: "clk_i",
+  reset_primary: "rst_ni",
+  bus_device: "reg",
+  regwidth: "32",
+  
+  // All your buttons and lights go here!
+  registers: [
+    {
+      name: "CONTROL",
+      desc: "Control register",
+      swaccess: "rw",
+      hwaccess: "hrw",
+      fields: [
+        { 
+          bits: "0", 
+          name: "accelerate_en", 
+          desc: "enable",
+          resval: 0
+        },
+        { 
+          bits: "1", 
+          name: "coeff_write_en", 
+          desc: "Turn ON to write coefficients",
+          resval: 0 
+        },
+        { 
+          bits: "2", 
+          name: "clr_c", 
+          desc: "clears coefficients in reg file",
+          resval: 0 
+        },
+        { 
+          bits: "3", 
+          name: "busy", 
+          desc: " ",
+          swaccess: "ro",
+          hwaccess: "hro",
+          resval: 0 
+        }
+      ]
+    },
+    {
+      name: "COEFF_ADDR",
+      desc: "address of coefficient",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { 
+          bits: "2:0", 
+          name: "addr", 
+          desc: " ",
+          resval: 0 
+        }
+      ]
+    },
+    {
+      name: "COEFF_DATA",
+      desc: "coefficients in",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { 
+          bits: "31:0", 
+          name: "coeff", 
+          desc: "The coefficients",
+          resval: 0 
+        }
+      ]
+    },
+    {
+      name: "SENSOR_DATA",
+      desc: "Put your sensor reading here",
+      swaccess: "rw",
+      hwaccess: "hro",
+      fields: [
+        { 
+          bits: "31:0", 
+          name: "sensor", 
+          desc: "Raw sensor value",
+          resval: 0 
+        }
+      ]
+    },
+    {
+      name: "RESULT",
+      desc: " ",
+      swaccess: "ro",
+      hwaccess: "hwo",
+      fields: [
+        { 
+          bits: "31:0", 
+          name: "result", 
+          desc: "The FIR filter result (READ ONLY)",
+          resval: 0 
+        }
+      ]
+    },
+    {
+      name: "STATUS",
+      desc: " ",
+      swaccess: "ro",
+      hwaccess: "hwo",
+      fields: [
+        { 
+          bits: "0", 
+          name: "result_valid", 
+          desc: " ",
+          resval: 0 
+        }
+      ]
+    }
+  ]
+}
