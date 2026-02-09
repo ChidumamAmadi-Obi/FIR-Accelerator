@@ -1,26 +1,32 @@
 
 #include "fir_accelerator_driver.h"
 
+void wait(uint8_t cycles){ // messy sleep function, will change later
+    for (int i=0; i<cycles; i++){
+        asm volatile("nop");
+    }
+}
+
 void firEnable(bool en){ // set/clear enable bit in control register
     FIR_ACC_PERIPH->CTRL = (en) ? FIR_ACC_PERIPH->CTRL | (1 << FIR_ACCELERATOR_CONTROL_ACCELERATE_EN_BIT) : FIR_ACC_PERIPH->CTRL &~(1 << FIR_ACCELERATOR_CONTROL_ACCELERATE_EN_BIT);
 }
 void firCWEnable(bool en){ // set/clear coeff write enable bit in control register
     FIR_ACC_PERIPH->CTRL = (en) ? FIR_ACC_PERIPH->CTRL | (1 << FIR_ACCELERATOR_CONTROL_COEFF_WRITE_EN_BIT) : FIR_ACC_PERIPH->CTRL &~(1 << FIR_ACCELERATOR_CONTROL_COEFF_WRITE_EN_BIT);
 }
-void firRst(){ //  reset accelerator
-    firEnable(false);
-    firEnable(true);
-    firCClear();
-    firRClear();
-}
 void firCClear(){ // clear coefficient register
     FIR_ACC_PERIPH->CTRL |= ( 1 << FIR_ACCELERATOR_CONTROL_CLR_C_BIT );
-    for (int i=0; i<CLEAR_DELAY_US; i++) { /* delay before clearing bit */ asm volatile("nop"); }
+    for (int i=0; i<CLEAR_DELAY_US; i++) { /* delay before clearing bit */ wait(255);}
     FIR_ACC_PERIPH->CTRL &= ~( 1 << FIR_ACCELERATOR_CONTROL_CLR_C_BIT );
 }
 void firRClear(){ // clear writeable registers
     FIR_ACC_PERIPH->CDATA=0;
     FIR_ACC_PERIPH->CADDR=0;
+}
+void firRst(){ //  reset accelerator
+    firEnable(false);
+    firEnable(true);
+    firCClear();
+    firRClear();
 }
 void firSendData(float dataIn){ // convert data in to fixed point and input into accelerator
     FIR_ACC_PERIPH->DATAI = FL2FP(dataIn);
@@ -46,7 +52,7 @@ FIRAcceleratorStatus firInit(){ // initiallize accelerator
     uint8_t countTimer=0;
     while (!(FIR_ACC_PERIPH->STATUS & ( 1 << FIR_ACCELERATOR_STATUS_RESULT_VALID_BIT))) {
         if (countTimer==TIMEOUT_COUNT) return TIME_OUT; // end with error
-        asm volatile("nop");
+        wait(255);
         countTimer++;
         /*
         wait until valid bit is set
@@ -74,7 +80,7 @@ FIRAcceleratorStatus firReadResult(float*dataOut){ // read result in data out re
     uint8_t countTimer=0;
     while (!(FIR_ACC_PERIPH->STATUS & ( 1 << FIR_ACCELERATOR_STATUS_RESULT_VALID_BIT))) {
         if (countTimer==TIMEOUT_COUNT) return TIME_OUT;
-        asm volatile("nop");
+        wait(255);
         countTimer++;
         /*
         wait until valid bit is set

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "core_v_mini_mcu.h"
 #include "fir_accelerator.h"
@@ -47,7 +48,6 @@ typedef enum{ // valid coeff addresses
     C_6,
     C_7
 } CoefficientAddresses;
-typedef enum { READ, WRITE } RW;
 
 // MACROS **************************************************************************************************
 /* fixed point conversions 
@@ -66,17 +66,20 @@ convertions need to be made before reading & writing to the peripheral
 #define  NUM_COEFF_REGS 8
 
 // delay macros ( will be replaced with proper timer implimentation later)
+#define SLEEP_ASM asm volatile("nop");
 #define TIMEOUT_COUNT 100
 #define CLEAR_DELAY_US 25
 
 // DECLARATIONS ********************************************************************************************
+void wait(uint8_t cycles); 
+
 void firEnable(bool en);
 void firCWEnable(bool en); // coefficient write enable
 void firCClear(); // clear coefficient register file
 void firRClear(); // clear writeable registers
 void firRst();
 void firSendData(float dataIn);
-void firLoacCoefficientBatch(float coeffsIn[NUM_COEFF_REGS]);
+void firLoadCoefficientBatch(float coeffsIn[NUM_COEFF_REGS]);
 
 FIRAcceleratorStatus firInit();
 FIRAcceleratorStatus firLoadCoefficient(uint8_t coeffAddr, float coeffIn);
