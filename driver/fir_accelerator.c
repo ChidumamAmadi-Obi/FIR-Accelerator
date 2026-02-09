@@ -15,7 +15,7 @@ void firCWEnable(bool en){ // set/clear coeff write enable bit in control regist
 }
 void firCClear(){ // clear coefficient register
     FIR_ACC_PERIPH->CTRL |= ( 1 << FIR_ACCELERATOR_CONTROL_CLR_C_BIT );
-    for (int i=0; i<CLEAR_DELAY_US; i++) { /* delay before clearing bit */ wait(255);}
+    wait(255);
     FIR_ACC_PERIPH->CTRL &= ~( 1 << FIR_ACCELERATOR_CONTROL_CLR_C_BIT );
 }
 void firRClear(){ // clear writeable registers
