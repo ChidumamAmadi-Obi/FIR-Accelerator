@@ -30,7 +30,6 @@ typedef struct{ // saccess all registers in accelerator from peripheral struct
 // ENUMS **************************************************************************************************
 typedef enum{ // keep track of accelerator error codes
     NONE,           // no errors occured
-    ERR,            // error occured
     TIME_OUT,
     OUT_OF_BOUNDS,  // user is trying to access something that does not exist/ outof bounds
     INVALID         // invalid 
@@ -63,12 +62,12 @@ convertions need to be made before reading & writing to the peripheral
 
 // init peripheral struct into memory address (defined in core_v_mini_mcu.h)
 #define FIR_ACC_PERIPH ((FIRAcceleratorPeriph*) FIR_ACCELERATOR_START_ADDRESS)
-#define  NUM_COEFF_REGS 8
+#define NUM_COEFF_REGS 8
 
-// delay macros ( will be replaced with proper timer implimentation later)
+// configure delay macros ( will be replaced with proper timer implimentation later)
 #define SLEEP_ASM asm volatile("nop");
+#define WAIT_CYCLES 255
 #define TIMEOUT_COUNT 100
-#define CLEAR_DELAY_US 25
 
 // DECLARATIONS ********************************************************************************************
 void wait(uint8_t cycles); 
@@ -78,9 +77,9 @@ void firCWEnable(bool en); // coefficient write enable
 void firCClear(); // clear coefficient register file
 void firRClear(); // clear writeable registers
 void firRst();
-void firSendData(float dataIn);
-void firLoadCoefficientBatch(float coeffsIn[NUM_COEFF_REGS]);
+void firSendData(float dataIn); // send data to be filtered
 
 FIRAcceleratorStatus firInit();
-FIRAcceleratorStatus firLoadCoefficient(uint8_t coeffAddr, float coeffIn);
+FIRAcceleratorStatus firLoadCoefficient(uint8_t coeffAddr, float coeffIn); 
+FIRAcceleratorStatus firLoadCoefficientBatch(float coeffsIn[NUM_COEFF_REGS]);
 FIRAcceleratorStatus firReadResult(float*dataOut);
