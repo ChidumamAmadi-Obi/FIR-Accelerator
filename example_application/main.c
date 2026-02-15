@@ -1,5 +1,4 @@
 /* FIR ACCELERATOR EXAMPLE PROGRAM
-
 */
 
 #include <stdlib.h>
@@ -20,13 +19,17 @@ float sensorValues(uint32_t max){ // emulate incoming sensor values by generatin
 
 int main(int argc, char *argv[]){
     COLOR_BOLD_YELLOW // change color output so i can see
-    printf("\n\n FIR ACCELERATOR EXAMPLE PROGRAM \n");
+    printf("\n\n --FIR ACCELERATOR EXAMPLE PROGRAM-- \n");
     COLOR_YELLOW
 
     // **********************************************************************
 
-    firInit();
-    if (errorCode != NONE) printf("ERROR, FAILED TO INITIALIZE ACCELERATOR");
+    errorCode=firInit();
+    if (errorCode != NONE) {
+        printf("ERROR, FAILED TO INITIALIZE ACCELERATOR");
+        return -1;
+    }
+
     float coefficients[8] = {0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1, 0.05};
     float incomingSensorValue=0;
     float filteredSensorValue=0;
@@ -35,11 +38,14 @@ int main(int argc, char *argv[]){
     for (int i=0; i<NUM_SENSOR_VALUES; i++) {
         incomingSensorValue=sensorValues(10);
         firSendData(incomingSensorValue);
-        errorCode = firReadResult(&filteredSensorValue);
+        errorCode=firReadResult(&filteredSensorValue);
 
-        if (errorCode != NONE) printf("ERROR, NULL POINTER PASSES INTO DRIVER");
+        if (errorCode != NONE) {
+            printf("ERROR, NULL POINTER");
+            return -1;
+        }
 
-        printf("Incoming Sensor Value: %f Filtered Sensor Value: %f\n");
+        printf("Incoming Sensor Value: %f Filtered Sensor Value: %f\n", incomingSensorValue, filteredSensorValue);
     }
     COLOR_RESET
     return EXIT_SUCCESS;
