@@ -69,9 +69,9 @@ module top_tb;
         $display("\n\n-----");
         loadCoeffs(0.2,coeffsIn, coeffAddress, coeffWriteEn); // first load coeffs into reg file
         $display("\n-----\n");
-        $display("T     SENSORIN   RESULT VALIDITY A_ENABLE RSTN");
-        $monitor("%0d -     %d     %0f     %b       %b     %b",
-          $time, f2r(sensorIn), f2r(resultOut), valid, accelerateEn, rstN);
+        $display("T     SENSORIN   RESULT VALIDITY BUSY A_ENABLE RSTN");
+        $monitor("%0d -     %0d     %0f     %b      %b    %b     %b",
+               $time, f2r(sensorIn), f2r(resultOut), valid, busy, accelerateEn, rstN);
 
         // test inserting 16 random sensor values between 0 and 5, result is zero until all (8) registers are populated
         sendRandomData(16,0,5,sensorIn); 

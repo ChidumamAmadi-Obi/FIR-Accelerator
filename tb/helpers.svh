@@ -1,7 +1,7 @@
 `ifndef HELPERS // file guard
 `define HELPERS
 
-`include "constants.svh"
+`include "tb_constants.svh"
 
 // TASKS AND FUNCTIONS
 function automatic logic signed [DATA_WIDTH-1:0] r2f(real val); // real to fixed point 32 bit

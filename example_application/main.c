@@ -18,27 +18,30 @@ float sensorValues(uint32_t max){ // emulate incoming sensor values by generatin
 }
 
 int main(int argc, char *argv[]){
+
+    float coefficients[8] = {0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1, 0.05};
+    float incomingSensorValue=0;
+    float filteredSensorValue=0;
+
     COLOR_BOLD_YELLOW // change color output so i can see
     printf("\n\n --FIR ACCELERATOR EXAMPLE PROGRAM-- \n");
     COLOR_YELLOW
 
     // **********************************************************************
 
-    errorCode=firInit();
+    errorCode=firInit(); // initialize accelerator and get error code
     if (errorCode != NONE) {
         printf("ERROR, FAILED TO INITIALIZE ACCELERATOR");
         return -1;
     }
 
-    float coefficients[8] = {0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1, 0.05};
-    float incomingSensorValue=0;
-    float filteredSensorValue=0;
+
     firLoadCoefficientBatch(coefficients);
 
     for (int i=0; i<NUM_SENSOR_VALUES; i++) {
         incomingSensorValue=sensorValues(10);
         firSendData(incomingSensorValue);
-        errorCode=firReadResult(&filteredSensorValue);
+        errorCode=firReadResult(&filteredSensorValue); // get result and store in filteredSensorValue
 
         if (errorCode != NONE) {
             printf("ERROR, NULL POINTER");

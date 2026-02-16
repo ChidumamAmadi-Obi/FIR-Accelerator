@@ -107,8 +107,8 @@ module fir_accelerator_reg_top #(
       .wd(control_accelerate_en_wd),
 
       // from internal hardware
-      .de(hw2reg.control.accelerate_en.de),
-      .d (hw2reg.control.accelerate_en.d),
+      .de(1'b0),
+      .d ('0),
 
       // to internal hardware
       .qe(),
@@ -133,8 +133,8 @@ module fir_accelerator_reg_top #(
       .wd(control_coeff_write_en_wd),
 
       // from internal hardware
-      .de(hw2reg.control.coeff_write_en.de),
-      .d (hw2reg.control.coeff_write_en.d),
+      .de(1'b0),
+      .d ('0),
 
       // to internal hardware
       .qe(),
@@ -159,8 +159,8 @@ module fir_accelerator_reg_top #(
       .wd(control_clr_c_wd),
 
       // from internal hardware
-      .de(hw2reg.control.clr_c.de),
-      .d (hw2reg.control.clr_c.d),
+      .de(1'b0),
+      .d ('0),
 
       // to internal hardware
       .qe(),
@@ -184,12 +184,12 @@ module fir_accelerator_reg_top #(
       .wd('0),
 
       // from internal hardware
-      .de(1'b0),
-      .d ('0),
+      .de(hw2reg.control.busy.de),
+      .d (hw2reg.control.busy.d),
 
       // to internal hardware
       .qe(),
-      .q (reg2hw.control.busy.q),
+      .q (),
 
       // to register interface (read)
       .qs(control_busy_qs)
@@ -296,7 +296,7 @@ module fir_accelerator_reg_top #(
 
       // to internal hardware
       .qe(),
-      .q (),
+      .q (reg2hw.result.q),
 
       // to register interface (read)
       .qs(result_qs)
