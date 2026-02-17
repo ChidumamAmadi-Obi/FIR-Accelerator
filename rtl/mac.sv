@@ -36,5 +36,9 @@ module mac (
     end
 
   end
+  
+  // dissable verilator widthtrunc warning...
+  // verilator lint_off WIDTHTRUNC
   assign macResult = accumulatorScaled[MAC_ACC_WIDTH-1:Q_FORMAT];// Truncate to original width, keep sign extended
+  // verilator lint_on WIDTHTRUNC
 endmodule
