@@ -28,14 +28,14 @@ Custom Finite Impulse Response (FIR) accelerator in System Verilog designed for 
  * ```constants.svh``` Project parameters
 
 ## Register Map
-| OFFSET | NAME | ACCESS | DESC |
-|--------|------|--------|------|
-| 0x00 | CONTROL | RW | ```bit 0``` accelerate_en, ```bit 1``` coeff_write_en, ```bit 2``` clr_c, ```bit 3``` busy (RO) |
-| 0x04 | COEFF_ADDR | RW | Coefficient address (0-7) for writing |
-| 0x08 | COEFF_DATA | RW | Coefficient value to write (Q16.16) |
-| 0x0C | SENSOR_DATA | RW | Raw sensor value (Q16.16) |
-| 0x10 | RESULT | RO | Filtered output (Q16.16) |
-| 0x14 | STATUS | RO | ```bit 0``` result_valid |
+| OFFSET | NAME | HW ACCESS | SW ACCESS | DESC |
+|--------|------|-----------|-----------|------|
+| 0x00 | CONTROL | WO/RO | RW/RO | ```bit 0``` accelerate_en, ```bit 1``` coeff_write_en, ```bit 2``` clr_c, ```bit 3``` busy (RO) |
+| 0x04 | COEFF_ADDR | RO | RW | Coefficient address (0-7) for writing |
+| 0x08 | COEFF_DATA | RO | RW | Coefficient value to write (Q16.16) |
+| 0x0C | SENSOR_DATA | RO | RW | Raw sensor value (Q16.16) |
+| 0x10 | RESULT | WO | RO | Filtered output (Q16.16) |
+| 0x14 | STATUS | WO | RO | ```bit 0``` result_valid |
 
 *NOTE: Register fields in ```fir_accelerator.h``` re generated and the driver uses the ```FIR_ACC_PERIPH``` pointer*
 
