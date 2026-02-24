@@ -24,14 +24,16 @@ filteredData = [1.000061, 3.000031, 5.700043, 9.300003, 11.600006, 12.199982, 11
 
 plt.style.use('dark_background')
 
-mpl.rcParams['lines.linewidth'] = 2
-mpl.rcParams['lines.linestyle'] = ':'
-
-plt.plot(loop, filteredData, label='FILTERED DATA', marker='o', color='cyan')
-plt.plot(loop, rawData, label='RAW DATA', marker='s', color='magenta')
+plt.plot(loop, filteredData, linestyle=':', label='FILTERED DATA', color='cyan')
+plt.plot(loop, rawData, linestyle='-', label='RAW DATA', color='magenta')
 
 plt.title('FIR ACCELERATOR INPUT VS OUTPUT')
 plt.xlabel('Loop Number')
 plt.ylabel('Magnitude')
+
+plt.gca().set_xticks([0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50])
+
+plt.gca().set_yticks([0,1,2,3,4,5,6,7,8,9,10,11,12])
+
 plt.legend()
 plt.show()
