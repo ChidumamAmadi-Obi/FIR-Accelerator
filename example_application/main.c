@@ -7,7 +7,7 @@
 #include "core_v_mini_mcu.h"
 #include "fir_accelerator_driver.h" 
 
-#define NUM_SENSOR_VALUES 30 // number of values to be filtered by fir accelerator (needs to be > 8)
+#define NUM_SENSOR_VALUES 50 // number of values to be filtered by fir accelerator (needs to be > 8)
 
 FIRAcceleratorStatus errorCode;
 
