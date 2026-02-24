@@ -16,7 +16,6 @@ module fir_accelerator (
   import reg_pkg::*;
   import fir_accelerator_reg_pkg::*;
 
-
   fir_accelerator_reg2hw_t reg2hw;  // CPU -> accelerator
   fir_accelerator_hw2reg_t hw2reg;  // accelerator -> CPU
 
@@ -41,6 +40,7 @@ module fir_accelerator (
       .clk          (clk_i),
       .rstN         (rst_ni),
       .clrC         (reg2hw.control.clr_c.q),
+      .shift        (reg2hw.control.shift.q),
       .accelerateEn (reg2hw.control.accelerate_en.q),
       .coeffWriteEn (reg2hw.control.coeff_write_en.q),
       .coeffAddress (reg2hw.coeff_addr.q),              // Now should be .q not .addr.q

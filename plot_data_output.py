@@ -1,0 +1,37 @@
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+loop = [0,1,2,3,4,5,6,7,8,9,10,
+        11,12,13,14,15,16,17,18,19,20,
+        21,22,23,24,25,26,27,28,29,30,
+        31,32,33,34,35,36,37,38,39,40,
+        41,42,43,44,45,46,47,48,49,50]
+
+# First column values (indices 0-50)
+rawData = [10, 10, 7, 9, 7, 3, 1, 9, 8, 2, 5, 6, 2, 4, 7, 7, 5, 9, 6, 8, 
+                1, 2, 3, 8, 0, 3, 5, 6, 8, 5, 0, 8, 5, 1, 3, 3, 3, 1, 2, 2, 
+                2, 8, 4, 4, 7, 10, 1, 10, 6, 9, 7]
+
+# Second column values (indices 0-50)
+filteredData = [1.000061, 3.000031, 5.700043, 9.300003, 11.600006, 12.199982, 11.500015, 
+           10.400116, 9.200073, 8.450073, 8.950058, 8.950043, 8.150009, 7.750046, 
+           7.650085, 7.500061, 8.000031, 9.250076, 10.100021, 10.700058, 10.899994, 
+           9.950073, 8.650009, 7.150116, 6.250015, 5.800095, 6.100006, 5.750061, 
+           6.700027, 7.750061, 8.300003, 8.600037, 8.350021, 7.450058, 7.300034, 
+           6.500061, 5.550018, 4.900024, 4.500061, 3.950012, 3.450027, 3.950058, 
+           4.650024, 5.650040, 7.150009, 8.300064, 8.899979, 9.900101, 10.600006, 
+           10.500107, 11.500000]
+
+plt.style.use('dark_background')
+
+mpl.rcParams['lines.linewidth'] = 2
+mpl.rcParams['lines.linestyle'] = ':'
+
+plt.plot(loop, filteredData, label='FILTERED DATA', marker='o', color='cyan')
+plt.plot(loop, rawData, label='RAW DATA', marker='s', color='magenta')
+
+plt.title('FIR ACCELERATOR INPUT VS OUTPUT')
+plt.xlabel('Loop Number')
+plt.ylabel('Magnitude')
+plt.legend()
+plt.show()
