@@ -3,9 +3,9 @@
 module mac_tb;
 	localparam NUM_TESTS = 4;
 
-    logic signed [DATA_WIDTH-1:0] pDataIn [0:NUM_REGS-1];
-    logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1];
-    logic signed [DATA_WIDTH-1:0] macResult;
+    logic signed [TB_DATA_WIDTH-1:0] pDataIn [0:TB_NUM_REGS-1];
+    logic signed [TB_DATA_WIDTH-1:0] coefs [0:TB_NUM_REGS-1];
+    logic signed [TB_DATA_WIDTH-1:0] macResult;
     real expectedMacResult;
 
     // error checking and reporting
@@ -21,39 +21,39 @@ module mac_tb;
   
     // HELPER FUNCTIONS & TASKS
     function automatic real verifMac( // calculate expected mac result
-        logic signed [DATA_WIDTH-1:0] pDataIn_array [0:NUM_REGS-1],
-        logic signed [DATA_WIDTH-1:0] coefs_array [0:NUM_REGS-1] );
-        logic signed [ACC_WIDTH-1:0] accumulator = 0;
-        logic signed [ACC_WIDTH-1:0] accumulatorScaled;
-        logic signed [DATA_WIDTH-1:0] result;
+        logic signed [TB_DATA_WIDTH-1:0] pDataIn_array [0:TB_NUM_REGS-1],
+        logic signed [TB_DATA_WIDTH-1:0] coefs_array [0:TB_NUM_REGS-1] );
+        logic signed [TB_ACC_WIDTH-1:0] accumulator = 0;
+        logic signed [TB_ACC_WIDTH-1:0] accumulatorScaled;
+        logic signed [TB_DATA_WIDTH-1:0] result;
         
-        for(integer i=0; i<NUM_REGS; i++) begin
+        for(integer i=0; i<TB_NUM_REGS; i++) begin
             accumulator += (coefs_array[i]) * (pDataIn_array[i]);
         end
         
-        accumulatorScaled = accumulator + (1 << (Q_FORMAT-1));
-        result = accumulatorScaled[ACC_WIDTH-1:Q_FORMAT];
+        accumulatorScaled = accumulator + (1 << (TB_Q_FORMAT-1));
+        result = accumulatorScaled[TB_ACC_WIDTH-1:TB_Q_FORMAT];
         return f2r(result);
     endfunction
   
     task automatic randomPData( // get random values for p data in
-      ref logic signed [DATA_WIDTH-1:0] pData_array [0:NUM_REGS-1],
+      ref logic signed [TB_DATA_WIDTH-1:0] pData_array [0:TB_NUM_REGS-1],
       input int min,
       input int max );
-        for (integer i=0; i<NUM_REGS; i++) begin
+        for (integer i=0; i<TB_NUM_REGS; i++) begin
             pData_array[i] = i2f($urandom_range(min, max));
         end
     endtask
     task automatic writeCoefs(
-      ref logic signed [DATA_WIDTH-1:0] coefs [0:NUM_REGS-1],
+      ref logic signed [TB_DATA_WIDTH-1:0] coefs [0:TB_NUM_REGS-1],
       input real value );  // Declare as real type
 
         if (value == $floor(value)) begin // if value is an integer
-            for (int i = 0; i < NUM_REGS; i++) begin
+            for (int i = 0; i < TB_NUM_REGS; i++) begin
                 coefs[i] = i2f(int'(value));  // Cast to int before conversion
             end
         end else begin 
-            for (int i = 0; i < NUM_REGS; i++) begin
+            for (int i = 0; i < TB_NUM_REGS; i++) begin
                 coefs[i] = r2f(value);
             end
         end
@@ -61,7 +61,7 @@ module mac_tb;
     task trackErrors( // track errors for mac module only
         ref logic [NUM_TESTS-1:0] errors, 
         ref integer testNumber,
-        input logic signed [DATA_WIDTH-1:0] macResult,
+        input logic signed [TB_DATA_WIDTH-1:0] macResult,
         input real expectedMacResult );
 		
         real macResultReal;        
@@ -122,6 +122,7 @@ module mac_tb;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // no 3: Random values (including negative) with coefs = 0.2
+        // incorrect outputs for negative values, still need to solve
         writeCoefs(coefs,0.2);
         randomPData(pDataIn,-20,20);
         expectedMacResult=verifMac(pDataIn,coefs);

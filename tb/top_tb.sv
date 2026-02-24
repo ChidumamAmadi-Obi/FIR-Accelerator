@@ -1,17 +1,17 @@
 `include "helpers.svh"
 
 module top_tb;
-
     logic clk; // inputs
     logic rstN;
     logic clrC;
+    logic shift;
     logic accelerateEn;
     logic coeffWriteEn;
     logic [2:0] coeffAddress;
-    logic [DATA_WIDTH-1:0] sensorIn;
-    logic signed [DATA_WIDTH-1:0] coeffsIn;
+    logic [TB_DATA_WIDTH-1:0] sensorIn;
+    logic signed [TB_DATA_WIDTH-1:0] coeffsIn;
 
-    logic signed [DATA_WIDTH-1:0] resultOut; // outputs
+    logic signed [TB_DATA_WIDTH-1:0] resultOut; // outputs
     logic busy;
     logic valid;
     
@@ -19,6 +19,7 @@ module top_tb;
         .clk(clk),
         .rstN(rstN),
         .clrC(clrC),
+        .shift(shift),
         .coeffWriteEn(coeffWriteEn),
         .coeffAddress(coeffAddress),
         .coeffIn(coeffsIn),
@@ -31,14 +32,14 @@ module top_tb;
 
     task loadCoeffs(
         input real coeffVal,
-        ref logic signed [DATA_WIDTH-1:0] coeffsIn,
+        ref logic signed [TB_DATA_WIDTH-1:0] coeffsIn,
         ref logic [2:0] coeffAddress,
         ref logic coeffWriteEn );
 
         coeffWriteEn=1; // start with coeff write enabled to load coefs into memory
         coeffAddress=3'b000; // start writting from address 000
 
-        for (integer i=0; i<NUM_REGS; i++) begin
+        for (integer i=0; i<TB_NUM_REGS; i++) begin
             coeffsIn=r2f(coeffVal); 
             coeffAddress++;   
             pulse(clk); // after each clock pulse the coef   
@@ -50,11 +51,11 @@ module top_tb;
         input integer no, // number of data points to be inserted
         input real min,
         input real max,
-        ref logic [DATA_WIDTH-1:0] sensorIn);
+        ref logic [TB_DATA_WIDTH-1:0] sensorIn);
 
         for (integer i=0; i<=no; i++) begin
             sensorIn=i2f($urandom_range(min,max));
-            pulse(clk);           
+            pulse(shift);           
         end
     endtask
 
@@ -79,10 +80,10 @@ module top_tb;
         // test enable
         // when sensor values come in and the accelerator is not enabled
         // the accelerator does not process it and its output is not affected
-        accelerateEn=0; pulse(clk);
+        accelerateEn=0; pulse(clk); pulse(shift);
         sendRandomData(6,0,5,sensorIn);
 
-        accelerateEn=1; pulse(clk); // re enable module
+        accelerateEn=1; pulse(clk); pulse(shift); // re enable module
         sendRandomData(6,0,5,sensorIn);
       
         pulse(rstN); // test reset  (high to low pulse), this should clear all registers
