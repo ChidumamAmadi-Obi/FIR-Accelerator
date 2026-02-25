@@ -1,4 +1,4 @@
-# FIR Accelerator
+# FIR Filter Accelerator
 Custom Finite Impulse Response (FIR) accelerator in System Verilog designed for integration with the PULP CV32E40X RISC-V core. Performs real-time fixed-point filtering on streaming sensor data using a shift register and a multiply-accumulate (MAC) unit.
 
 **What it does:** The accelerator offloads the multiply-accumulate operations of a digital FIR filter from the CPU.
@@ -9,7 +9,7 @@ Custom Finite Impulse Response (FIR) accelerator in System Verilog designed for 
  * Auto-generated register interface using ```regtool```
  * Software driver (coefficient loading, data input, getting result)
    
-*This accelerator is integrated into X_HEEP [here](https://github.com/ChidumamAmadi-Obi/x-heep-exploration/tree/fir-accelerator) as a memory-mapped peripheral and is compatible with the PULP ```cv32e40x``` core*
+*This accelerator is integrated into X_HEEP [**here**](https://github.com/ChidumamAmadi-Obi/x-heep-exploration/tree/fir-accelerator) as a memory-mapped peripheral and is compatible with the PULP ```cv32e40x``` core*
 
 ## Architecture
 <img width="700" height="829" alt="image" src="https://github.com/user-attachments/assets/4392e586-00e3-4799-bffb-65408d520f68" />
