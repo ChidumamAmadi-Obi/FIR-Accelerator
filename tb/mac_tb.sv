@@ -68,7 +68,7 @@ module mac_tb;
         macResultReal = f2r(macResult);// onvert macResult to real for comparison
         
         // compare with tolerance for floating-point comparisons
-        if ($abs(macResultReal - expectedMacResult) > 0.0001) begin 
+        if ((macResultReal - expectedMacResult) > 0.0001) begin 
             errors = errors | (1 << testNumber);
             $display("Test %0d FAILED: Expected %f, Got %f (Difference: %f)", 
                      testNumber, expectedMacResult, macResultReal, 

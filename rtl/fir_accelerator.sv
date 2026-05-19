@@ -19,7 +19,7 @@ module fir_accelerator (
   fir_accelerator_reg2hw_t reg2hw;  // CPU -> accelerator
   fir_accelerator_hw2reg_t hw2reg;  // accelerator -> CPU
 
-  logic busy_wire; 
+  logic busy_wire;  // wires
   logic result_valid_wire;
   logic [FIR_DATA_WIDTH-1:0] mac_result_wire;
 
@@ -43,18 +43,18 @@ module fir_accelerator (
       .shift        (reg2hw.control.shift.q),
       .accelerateEn (reg2hw.control.accelerate_en.q),
       .coeffWriteEn (reg2hw.control.coeff_write_en.q),
-      .coeffAddress (reg2hw.coeff_addr.q),              
-      .rawSensorVal (reg2hw.sensor_data.q),             
-      .coeffIn      (reg2hw.coeff_data.q),            
+      .coeffAddress (reg2hw.coeff_addr.q),              // Now should be .q not .addr.q
+      .rawSensorVal (reg2hw.sensor_data.q),             // Now should be .q not .sensor.q  
+      .coeffIn      (reg2hw.coeff_data.q),              // Now should be .q not .coeff.q
       .macResult    (mac_result_wire),
       .resultIsValid(result_valid_wire),
       .busy         (busy_wire)
   );
 
-  assign hw2reg.control.busy.d = busy_wire; 
+  assign hw2reg.control.busy.d = busy_wire;  // Connect the busy to cntrl register
   assign hw2reg.control.busy.de = 1'b1;
   assign hw2reg.result.d = mac_result_wire;  // Connect to result register
-  assign hw2reg.result.de = result_valid_wire; 
+  assign hw2reg.result.de = result_valid_wire;  // Only update the answer when rdy
   assign hw2reg.status.d = result_valid_wire;  // Connect the ready to status register
   assign hw2reg.status.de = 1'b1;
 endmodule
