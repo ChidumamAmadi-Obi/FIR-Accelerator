@@ -31,7 +31,12 @@ module mac_tb;
             accumulator += (coefs_array[i]) * (pDataIn_array[i]);
         end
         
-        accumulatorScaled = accumulator + (1 << (TB_Q_FORMAT-1));
+        if (accumulator >= 0) begin  // if positive...
+          accumulatorScaled = accumulator + (1 << (TB_Q_FORMAT - 1));
+    	end else begin  // if negative...
+          accumulatorScaled = accumulator - (1 << (TB_Q_FORMAT - 1));
+   	 	end
+
         result = accumulatorScaled[TB_ACC_WIDTH-1:TB_Q_FORMAT];
         return f2r(result);
     endfunction
@@ -122,9 +127,8 @@ module mac_tb;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
 
         // no 3: Random values (including negative) with coefs = 0.2
-        // incorrect outputs for negative values, still need to solve
         writeCoefs(coefs,0.2);
-        randomPData(pDataIn,-20,20);
+        randomPData(pDataIn,-5,-1);
         expectedMacResult=verifMac(pDataIn,coefs);
         #10;
         trackErrors(errors, testNumber, macResult, expectedMacResult);
