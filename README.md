@@ -76,7 +76,6 @@ float coefficients[8] = {0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1, 0.05}; // default co
  - Verilator / Questa / or other simulator for RTL simulation
 
 ## How This Could be Improved
- - [ ] Support for negative numbers
  - [ ] Use of a proper timer for delays in the driver
  - [ ] Use of atomic operations when writing to the control register (theres a small chance of race conditions if interrupted)
  - [ ] More robust hardware design
